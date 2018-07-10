@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "outDir": "dist",
+        "rootDir": "src",
+        "declaration": true,
+        "target": "es5",
+        "lib": [
+            "es5", "es6", "dom"
+        ],
+        "module": "es2015",
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "strictNullChecks": true,
+        "types": [
+        ],
+        "typeRoots": [
+        ]
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "src/**/*.spec.*",
+        "tests/**/*"
+    ]
+}
