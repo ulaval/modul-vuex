@@ -1,7 +1,7 @@
 {
     "name": "@ulaval/modul-vuex",
     "version": "1.0.1-0",
-    "description": "MODUL vuex utilities",
+    "description": "MODUL Vuex utilities",
     "author": "Martin Simard <martin.simard@dti.ulaval.ca>",
     "private": false,
     "scripts": {
