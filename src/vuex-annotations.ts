@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import * as Vuex from 'vuex';
 
-function debug(type: 'act' | 'mut' | 'get', moduleName: string, key: string, args: string | IArguments | Array<any> = '') {
+function debug(type: 'act' | 'mut' | 'get', moduleName: string, key: string, args: string | IArguments | Array<any> = ''): void {
     if ((Vue.config as any)['debugVuex']) {
 
         if (args instanceof Array) {
@@ -14,7 +14,9 @@ function debug(type: 'act' | 'mut' | 'get', moduleName: string, key: string, arg
     }
 }
 
-export function Getter() {
+type GetterFunc = (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => any;
+
+export function Getter(): GetterFunc {
     // target is the class constructor
     // key is the name of the property
     return (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => {
@@ -22,7 +24,7 @@ export function Getter() {
         const originalFunction = descriptor.get || descriptor.value;
 
         // To call the raw getter with the store api
-        const getterFunction = function invokeGetter(this: any) {
+        const getterFunction = function invokeGetter(this: any): any {
             const res = this.store.getters[this.moduleName + '/' + key];
 
             // If the getter has arguments, the return will be a function that needs to be executed with the current arguments
@@ -30,13 +32,13 @@ export function Getter() {
         };
 
         // This function gets called to compute the value of the getter
-        const wrapperFunction = function wrapGetter(this: any, state: any/*, getters, rootState, rootGetters*/) {
+        const wrapperFunction = function wrapGetter(this: any, state: any/*, getters, rootState, rootGetters*/): any {
             this.state = state;
             const _this = this;
 
             if (hasArguments) {
                 // In case the getter has arguments, we need to wrap inside a function
-                return function(this: any) {
+                return function(this: any): any {
                     debug('get', this.moduleName, key, arguments);
                     return originalFunction.apply(_this, arguments);
                 };
@@ -57,17 +59,19 @@ export function Getter() {
     };
 }
 
-export function Mutation(params?: { options: Vuex.CommitOptions }) {
+type MutationFunc = (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => any;
+
+export function Mutation(params?: { options: Vuex.CommitOptions }): MutationFunc {
     return (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => {
 
         const originalFunction = descriptor.value;
 
-        const commitFunction = function commitMutation(this: any) {
+        const commitFunction = function commitMutation(this: any): any {
             this.store.commit(this.moduleName + '/' + key, Array.prototype.slice.call(arguments), params ? params.options : undefined);
             return originalFunction._return;
         };
 
-        const wrapperFunction = function wrapMutation(this: any, state: any, args: any) {
+        const wrapperFunction = function wrapMutation(this: any, state: any, args: any): any {
             debug('mut', this.moduleName, key, args);
             this.state = state;
             originalFunction._return = originalFunction.apply(this, args);
@@ -82,17 +86,19 @@ export function Mutation(params?: { options: Vuex.CommitOptions }) {
     };
 }
 
-export function Action() {
+type ActionFunc = (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => any;
+
+export function Action(): ActionFunc {
     return (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => {
 
         const originalFunction = descriptor.value;
 
-        const dispatchFunction = function dispatchAction(this: any) {
+        const dispatchFunction = function dispatchAction(this: any): any {
             this.store.dispatch(this.moduleName + '/' + key, Array.prototype.slice.call(arguments));
             return originalFunction._return;
         };
 
-        const wrapperFunction = function wrapAction(this: any, { state }: { state: any }, args: any) {
+        const wrapperFunction = function wrapAction(this: any, { state }: { state: any }, args: any): any {
             debug('act', this.moduleName, key, args);
             this.state = state;
             return originalFunction._return = originalFunction.apply(this, args);
@@ -107,11 +113,11 @@ export function Action() {
     };
 }
 
-function bindThis(_this: any, object: any) {
+function bindThis(_this: any, object: any): any {
     const binded: any = {};
     for (const key in object) {
         const fc = object[key];
-        binded[key] = function bindThisWrapper() {
+        binded[key] = function bindThisWrapper(): any {
             return fc.apply(_this, arguments);
         };
     }
