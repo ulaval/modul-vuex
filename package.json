@@ -9,7 +9,9 @@
         "reset": "rmdir /S /Q node_modules",
         "build": "rimraf dist && tsc",
         "tslint": "tslint -c conf/tslint.json -e 'src/**/*.d.ts' -s node_modules/custom-tslint-formatters/formatters -t grouped 'src/**/*.ts'",
-        "prepack": "npm run clean && npm run build"
+        "prepack": "npm run clean && npm run build",
+        "print_version_win": "echo %npm_package_version%",
+        "print_version_nx": "echo $npm_package_version"
     },
     "dependencies": {},
     "peerDependencies": {
