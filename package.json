@@ -9,12 +9,11 @@
         "reset": "rmdir /S /Q node_modules",
         "build": "rimraf dist && tsc",
         "tslint": "tslint -c conf/tslint.json -e 'src/**/*.d.ts' -s node_modules/custom-tslint-formatters/formatters -t grouped 'src/**/*.ts'",
-        "prepack": "npm run clean && npm run build",
-        "component": "node ./tests/meta/component-generator"
+        "prepack": "npm run clean && npm run build"
     },
     "dependencies": {},
     "peerDependencies": {
-        "vue": "^2.5.9"
+        "vuex": "^3.0.1"
     },
     "devDependencies": {
         "custom-tslint-formatters": "^2.4.0",
@@ -22,8 +21,7 @@
         "tslint": "^5.10.0",
         "tslint-config-standard": "^7.1.0",
         "typescript": "^2.9.2",
-        "vue": "^2.5.16",
-        "vuex": "^3.0.1"
+        "vue": "^2.5.16"
     },
     "repository": {
         "type": "git",
