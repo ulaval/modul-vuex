@@ -1,46 +1,51 @@
 {
-    "name": "@ulaval/modul-vuex",
-    "version": "1.0.1",
-    "description": "MODUL Vuex utilities",
-    "author": "Martin Simard <martin.simard@dti.ulaval.ca>",
-    "private": false,
-    "scripts": {
-        "clean": "rimraf dist",
-        "reset": "rmdir /S /Q node_modules",
-        "build": "rimraf dist && tsc",
-        "tslint": "tslint -c conf/tslint.json -e 'src/**/*.d.ts' -s node_modules/custom-tslint-formatters/formatters -t grouped 'src/**/*.ts'",
-        "prepack": "npm run clean && npm run build",
-        "print_version_win": "echo %npm_package_version%",
-        "print_version_nx": "echo $npm_package_version"
-    },
-    "dependencies": {},
-    "peerDependencies": {
-        "vuex": "^3.0.1"
-    },
-    "devDependencies": {
-        "custom-tslint-formatters": "^2.4.0",
-        "rimraf": "^2.6.2",
-        "tslint": "^5.10.0",
-        "tslint-config-standard": "^7.1.0",
-        "typescript": "^2.9.2",
-        "vue": "^2.5.16",
-        "vuex": "^3.0.1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/ulaval/modul-vuex.git"
-    },
-    "engines": {
-        "node": ">= 8.0.0",
-        "npm": ">= 6.0.0"
-    },
-    "browserslist": [
-        "> 1%",
-        "last 2 versions",
-        "not ie <= 10"
-    ],
-    "files": [
-        "dist"
-    ],
-    "license": "Apache-2.0"
+  "name": "@ulaval/modul-vuex",
+  "version": "1.0.1",
+  "description": "MODUL Vuex utilities",
+  "author": "Martin Simard <martin.simard@dti.ulaval.ca>",
+  "private": false,
+  "scripts": {
+    "clean": "rimraf dist",
+    "reset": "rmdir /S /Q node_modules",
+    "build": "rimraf dist && tsc",
+    "tslint": "tslint -c conf/tslint.json -e 'src/**/*.d.ts' -s node_modules/custom-tslint-formatters/formatters -t grouped 'src/**/*.ts'",
+    "prepack": "npm run clean && npm run build",
+    "print_version_win": "echo %npm_package_version%",
+    "print_version_nx": "echo $npm_package_version",
+    "test": "jest"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.11.5",
+    "@types/jest": "^26.0.14",
+    "custom-tslint-formatters": "^2.4.0",
+    "jest": "^26.5.0",
+    "rimraf": "^2.6.2",
+    "ts-jest": "^26.4.1",
+    "tslint": "^5.10.0",
+    "tslint-config-standard": "^7.1.0",
+    "typescript": "^2.9.2",
+    "vue": "^2.5.16",
+    "vuex": "^3.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ulaval/modul-vuex.git"
+  },
+  "engines": {
+    "node": ">= 8.0.0",
+    "npm": ">= 6.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 10"
+  ],
+  "files": [
+    "dist"
+  ],
+  "license": "Apache-2.0"
 }
