@@ -135,7 +135,7 @@ function bindThis(_this: any, object: any): any {
 export abstract class ModuleBase<S> {
 
     constructor(protected moduleName: string, protected state: S, public store: Vuex.Store<any>) {
-        const options = {
+        const options: Vuex.Module<S, {}> = {
             namespaced: true,
             state,
             getters: bindThis(this, (this as any)['_getters']),

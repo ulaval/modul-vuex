@@ -5,23 +5,28 @@ import Vue from 'vue';
 Vue.use(Vuex);
 
 class ModuleState {
-    state = 'test';
+    public token = 'initialToken';
 }
 
 class Module extends ModuleBase<ModuleState> {
     @Getter()
-    get() {
-        return this.state.state;
+    getToken() {
+        return this.state.token;
+    }
+
+    @Getter()
+    get token() {
+        return this.state.token;
     }
 
     @Mutation()
-    set(state: string) {
-        return this.state.state = state;
+    setToken(token: string) {
+        return this.state.token = token;
     }
 
     @Action()
-    action() {
-        this.set('set by action');
+    setSpecialToken(token: string) {
+        this.setToken(token);
     }
 }
 
@@ -29,19 +34,23 @@ describe('Given the Module class with vuex-annotations', () => {
     
     describe('When the annotations are compiled', () => {
         
-        test('Then, the get method has been wrapped into a function and has been set to the Module prototype into the getters list', () => {
-            expect(Module.prototype['_getters']['get']).toEqual(expect.any(Function));
-            expect((Module.prototype['_getters']['get'] as Function).name).toBe('wrapGetter');
+        test('Then, getter methods has been wrapped into functions and has been set to the Module prototype into the _getters object', () => {
+            expect(Module.prototype['_getters']).toEqual({
+                getToken: expect.any(Function),
+                token: expect.any(Function)
+            });
         });
 
-        test('Then, the set method has been wrapped into a function and has been set to the Module prototype into the mutations list', () => {
-            expect(Module.prototype['_mutations']['set']).toEqual(expect.any(Function));
-            expect((Module.prototype['_mutations']['set'] as Function).name).toBe('wrapMutation');
+        test('Then, mutation methods has been wrapped into functions and has been set to the Module prototype into the _mutations object', () => {
+            expect(Module.prototype['_mutations']).toEqual({
+                setToken: expect.any(Function)
+            });
         });
 
-        test('Then, the action method has been wrapped into a function and has been set to the Module prototype into the actions list', () => {
-            expect(Module.prototype['_actions']['action']).toEqual(expect.any(Function));
-            expect((Module.prototype['_actions']['action'] as Function).name).toBe('wrapAction');
+        test('Then, action methods has been wrapped into functions and has been set to the Module prototype into the _actions object', () => {
+            expect(Module.prototype['_actions']).toEqual({
+                setSpecialToken: expect.any(Function)
+            });
         });
 
     });
@@ -51,36 +60,68 @@ describe('Given the Module class with vuex-annotations', () => {
         let moduleState: ModuleState | undefined = undefined;
         let store: Store<any> | undefined = undefined;
         let module: Module | undefined = undefined;
-        // let state: string | undefined = undefined;
         
         beforeEach(() => {
             moduleState = new ModuleState();
             store = new Vuex.Store<any>({ strict: true });
             jest.spyOn(store, 'registerModule');
+            jest.spyOn(store, 'commit');
+            jest.spyOn(store, 'dispatch');
             module = new Module('moduleName', moduleState, store);
         });
 
-        test('Then, the store is registered with the right options', () => {
+        test('Then, the module is registered in the store with the right options', () => {
             expect(store!.registerModule).toHaveBeenCalledWith('moduleName', {
                 namespaced: true,
                 state: moduleState,
-                getters: {get: expect.any(Function)},
-                actions: {action: expect.any(Function)},
-                mutations: {set: expect.any(Function)}
+                getters: { getToken: expect.any(Function), token: expect.any(Function) },
+                actions: { setSpecialToken: expect.any(Function) },
+                mutations: { setToken: expect.any(Function) }
             });
         });
 
-        describe('When the getter is called', () => {
+        test('Then, the initialToken value is returned with a getter method', () => {
+            expect(module!.getToken()).toBe('initialToken');
+        });
+
+        test('Then, the initialToken value is returned with a getter getter', () => {
+            expect(module!.token).toBe('initialToken');
+        });
+
+        describe('When setToken mutation is called with a payload', () => {
             
-            // beforeEach(() => {
-            //     state = 
-            // });
-
-            test('Then, the right value is returned', () => {
-                expect(module!.get()).toBe('test');
+            const payload: string = 'newToken';
+            
+            beforeEach(() => {
+                module!.setToken(payload);
             });
 
-        });
+            test('Then, the state token has been commited to the store with the right parameters', () => {
+                expect(store!.commit).toHaveBeenLastCalledWith('moduleName/setToken', [payload], undefined);
+            });
+            
+            test('Then, the state token has been changed to the payload', () => {
+                expect(module!.getToken()).toBe(payload);
+            });
+        })
+
+        describe('When setSpecialToken action is called with a payload', () => {
+            
+            const payload: string = 'specialToken';
+            
+            beforeEach(() => {
+                module!.setSpecialToken(payload);
+            });
+            
+            test('Then, the store has dispatched the action with the right parameters', () => {
+                expect(store!.dispatch).toHaveBeenLastCalledWith('moduleName/setSpecialToken', [payload]);
+            });
+            
+            test('Then, the state token has been changed to the payload', () => {
+                expect(module!.getToken()).toBe(payload);
+            });
+
+        })
 
     });
     
