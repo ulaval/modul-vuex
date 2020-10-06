@@ -30,24 +30,24 @@ class Module extends ModuleBase<ModuleState> {
     }
 }
 
-describe('Given the Module class with vuex-annotations', () => {
+describe('Given a vuex module class with vuex-annotations', () => {
     
     describe('When the annotations are compiled', () => {
         
-        test('Then, getter methods has been wrapped into functions and has been set to the Module prototype into the _getters object', () => {
+        test('Then, getter methods has been wrapped into functions and has been set to the class prototype into the _getters object', () => {
             expect(Module.prototype['_getters']).toEqual({
                 getToken: expect.any(Function),
                 token: expect.any(Function)
             });
         });
 
-        test('Then, mutation methods has been wrapped into functions and has been set to the Module prototype into the _mutations object', () => {
+        test('Then, mutation methods has been wrapped into functions and has been set to the class prototype into the _mutations object', () => {
             expect(Module.prototype['_mutations']).toEqual({
                 setToken: expect.any(Function)
             });
         });
 
-        test('Then, action methods has been wrapped into functions and has been set to the Module prototype into the _actions object', () => {
+        test('Then, action methods has been wrapped into functions and has been set to the class prototype into the _actions object', () => {
             expect(Module.prototype['_actions']).toEqual({
                 setSpecialToken: expect.any(Function)
             });
@@ -55,22 +55,29 @@ describe('Given the Module class with vuex-annotations', () => {
 
     });
 
-    describe('When the module Module is instancied', () => {
+    describe('When the class is instancied', () => {
 
         let moduleState: ModuleState | undefined = undefined;
         let store: Store<any> | undefined = undefined;
         let module: Module | undefined = undefined;
+        let getterSpy: jest.SpyInstance | undefined = undefined;
         
         beforeEach(() => {
             moduleState = new ModuleState();
+            
             store = new Vuex.Store<any>({ strict: true });
             jest.spyOn(store, 'registerModule');
             jest.spyOn(store, 'commit');
             jest.spyOn(store, 'dispatch');
+            
             module = new Module('moduleName', moduleState, store);
+            jest.spyOn(module, 'getToken');
+            getterSpy = jest.spyOn(module, 'token', 'get');
+            jest.spyOn(module, 'setToken');
+            jest.spyOn(module, 'setSpecialToken')
         });
 
-        test('Then, the module is registered in the store with the right options', () => {
+        test('Then, the vuex module is registered in the store with the right options', () => {
             expect(store!.registerModule).toHaveBeenCalledWith('moduleName', {
                 namespaced: true,
                 state: moduleState,
@@ -80,15 +87,43 @@ describe('Given the Module class with vuex-annotations', () => {
             });
         });
 
-        test('Then, the initialToken value is returned with a getter method', () => {
-            expect(module!.getToken()).toBe('initialToken');
+        describe('When a getter method is called', () => {
+
+            let token: string | undefined = undefined;
+            
+            beforeEach(() => {
+                token = module!.getToken();
+            });
+
+            test('Then, the token has the initialToken value', () => {
+                expect(token).toBe('initialToken');
+            });
+
+            test('Then, the getter has been called on the class instance', () => {
+                expect(module!.getToken).toHaveBeenCalledWith();
+            });
+
         });
 
-        test('Then, the initialToken value is returned with a getter getter', () => {
-            expect(module!.token).toBe('initialToken');
+        describe('When a getter getter is gotten', () => {
+
+            let token: string | undefined = undefined;
+            
+            beforeEach(() => {
+                token = module!.token
+            });
+
+            test('Then, the token has the initialToken value', () => {
+                expect(token).toBe('initialToken');
+            });
+
+            test('Then, the getter has been called on the class instance', () => {
+                expect(getterSpy).toHaveBeenCalledWith();
+            });
+
         });
 
-        describe('When setToken mutation is called with a payload', () => {
+        describe('When a mutation is called with a payload', () => {
             
             const payload: string = 'newToken';
             
@@ -97,7 +132,11 @@ describe('Given the Module class with vuex-annotations', () => {
             });
 
             test('Then, the state token has been commited to the store with the right parameters', () => {
-                expect(store!.commit).toHaveBeenLastCalledWith('moduleName/setToken', [payload], undefined);
+                expect(store!.commit).toHaveBeenCalledWith('moduleName/setToken', [payload], undefined);
+            });
+
+            test('Then, the mutation has been called on the class instance with the payload', () => {
+                expect(module!.setToken).toHaveBeenCalledWith(payload);
             });
             
             test('Then, the state token has been changed to the payload', () => {
@@ -105,7 +144,7 @@ describe('Given the Module class with vuex-annotations', () => {
             });
         })
 
-        describe('When setSpecialToken action is called with a payload', () => {
+        describe('When a action is called with a payload', () => {
             
             const payload: string = 'specialToken';
             
@@ -114,7 +153,11 @@ describe('Given the Module class with vuex-annotations', () => {
             });
             
             test('Then, the store has dispatched the action with the right parameters', () => {
-                expect(store!.dispatch).toHaveBeenLastCalledWith('moduleName/setSpecialToken', [payload]);
+                expect(store!.dispatch).toHaveBeenCalledWith('moduleName/setSpecialToken', [payload]);
+            });
+
+            test('Then, the action has been called on the class instance with the payload', () => {
+                expect(module!.setSpecialToken).toHaveBeenCalledWith(payload);
             });
             
             test('Then, the state token has been changed to the payload', () => {
