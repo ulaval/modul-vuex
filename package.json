@@ -7,7 +7,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "reset": "rmdir /S /Q node_modules",
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && tsc --project tsconfig.build.json",
     "tslint": "tslint -c conf/tslint.json -e 'src/**/*.d.ts' -s node_modules/custom-tslint-formatters/formatters -t grouped 'src/**/*.ts'",
     "prepack": "npm run clean && npm run build",
     "print_version_win": "echo %npm_package_version%",
