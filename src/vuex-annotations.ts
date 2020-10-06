@@ -14,12 +14,12 @@ function debug(type: 'act' | 'mut' | 'get', moduleName: string, key: string, arg
     }
 }
 
-type GetterFunc = (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => any;
+type GetterFunc = (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => void;
 
 export function Getter(): GetterFunc {
     // target is the class constructor
     // key is the name of the property
-    return (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => {
+    return (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => {
         const hasArguments = !descriptor.get;
         const originalFunction = descriptor.get || descriptor.value;
 
@@ -59,10 +59,10 @@ export function Getter(): GetterFunc {
     };
 }
 
-type MutationFunc = (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => any;
+type MutationFunc = (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => void;
 
 export function Mutation(params?: { options: Vuex.CommitOptions }): MutationFunc {
-    return (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => {
+    return (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => {
 
         const originalFunction = descriptor.value;
 
@@ -86,10 +86,10 @@ export function Mutation(params?: { options: Vuex.CommitOptions }): MutationFunc
     };
 }
 
-type ActionFunc = (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => any;
+type ActionFunc = (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => void;
 
 export function Action(): ActionFunc {
-    return (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => {
+    return (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => {
 
         const originalFunction = descriptor.value;
 
