@@ -56,7 +56,7 @@ export function Getter(): GetterFunc {
             target['_getters'] = {};
         }
 
-        if(target['_getters'][key]) {
+        if (target['_getters'][key]) {
             throw new Error('Duplicate getter key ' + key + ' of target ' + target.constructor.name + ' has already been set');
         }
 
@@ -88,7 +88,7 @@ export function Mutation(params?: { options: Vuex.CommitOptions }): MutationFunc
             target['_mutations'] = {};
         }
 
-        if(target['_mutations'][key]) {
+        if (target['_mutations'][key]) {
             throw new Error('Duplicate mutation key ' + key + ' of target ' + target.constructor.name + ' has already been set');
         }
 
@@ -120,7 +120,7 @@ export function Action(): ActionFunc {
             target['_actions'] = {};
         }
 
-        if(target['_actions'][key]) {
+        if (target['_actions'][key]) {
             throw new Error('Duplicate action key ' + key + ' of target ' + target.constructor.name + ' has already been set');
         }
 
@@ -142,12 +142,12 @@ function bindThis(_this: any, object: any): any {
 
 function getRecursiveAnnotations(object: any, keyAnnotations: string): any {
     const recursiveAnnotations: any = {};
-    
+
     let parentObject: any = Object.getPrototypeOf(object);
-    
-    while(parentObject) {
-        for(var key in parentObject[keyAnnotations]) {
-            if(!recursiveAnnotations[key]) {
+
+    while (parentObject) {
+        for (let key in parentObject[keyAnnotations]) {
+            if (!recursiveAnnotations[key]) {
                 recursiveAnnotations[key] = parentObject[keyAnnotations][key];
             }
         }

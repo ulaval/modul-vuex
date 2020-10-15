@@ -285,7 +285,7 @@ describe('Given a vuex module class with vuex-annotations', () => {
             });
 
         });
-        
+
         describe('When a parent\'s getter getter is gotten', () => {
 
             let token: string | undefined = undefined;
@@ -316,7 +316,7 @@ describe('Given a vuex module class with vuex-annotations', () => {
                 expect(childModule!.getToken()).toBe('childchild' + payload);
             });
         });
-        
+
         describe('When a parent\'s mutation is called with a payload', () => {
 
             const payload: string = 'newToken';
@@ -351,7 +351,7 @@ describe('Given a vuex module class with vuex-annotations', () => {
             });
 
         });
-        
+
         describe('When a parent\'s action is called with a payload', () => {
 
             const payload: string = 'token';
