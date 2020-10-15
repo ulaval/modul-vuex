@@ -4,76 +4,84 @@ import Vue from 'vue';
 
 Vue.use(Vuex);
 
+const INITIAL_TOKEN_IN_PARENT: string = 'initialTokenInParent';
+const INITIAL_PARENT_TOKEN_IN_PARENT: string = 'initialParentTokenInParent';
+const INITIAL_TOKEN_IN_CHILD: string = 'initialTokenInChild';
+
+const PARENT_PREFIX: string = 'parent';
+const CHILD_PREFIX: string = 'child';
+const SPECIAL_PREFIX: string = 'special';
+
 class ParentModuleState {
-    public token = 'initialParentToken';
-    public parentToken = 'initialParentToken';
+    public token = INITIAL_TOKEN_IN_PARENT;
+    public parentToken = INITIAL_PARENT_TOKEN_IN_PARENT;
 }
 
 class ChildModuleState extends ParentModuleState {
-    public token = 'initialChildToken';
+    public token = INITIAL_TOKEN_IN_CHILD;
 }
 
 class ParentModule<S extends ParentModuleState> extends ModuleBase<S> {
     @Getter()
     getToken(): string {
-        return this.state.token;
+        return PARENT_PREFIX + this.state.token;
     }
 
     @Getter()
     get token(): string {
-        return this.state.token;
+        return PARENT_PREFIX + this.state.token;
     }
 
     @Mutation()
     setToken(token: string): void {
-        this.state.token = token;
+        this.state.token = PARENT_PREFIX + token;
     }
 
     @Action()
     setSpecialToken(token: string): void {
-        this.setToken('special' + token);
+        this.setToken(SPECIAL_PREFIX + token);
     }
 
     @Getter()
     getParentToken(): string {
-        return this.state.parentToken;
+        return PARENT_PREFIX + this.state.parentToken;
     }
 
     @Getter()
     get parentToken(): string {
-        return this.state.parentToken;
+        return PARENT_PREFIX + this.state.parentToken;
     }
 
     @Mutation()
     setParentToken(parentToken: string): void {
-        this.state.parentToken = parentToken;
+        this.state.parentToken = PARENT_PREFIX + parentToken;
     }
 
     @Action()
     setSpecialParentToken(parentToken: string): void {
-        this.setParentToken('special' + parentToken);
+        this.setParentToken(SPECIAL_PREFIX + parentToken);
     }
 }
 
 class ChildModule extends ParentModule<ChildModuleState> {
     @Getter()
     getToken(): string {
-        return 'child' + this.state.token;
+        return CHILD_PREFIX + this.state.token;
     }
 
     @Getter()
     get token(): string {
-        return 'child' + this.state.token;
+        return CHILD_PREFIX + this.state.token;
     }
 
     @Mutation()
     setToken(token: string): void {
-        this.state.token = 'child' + token;
+        this.state.token = CHILD_PREFIX + token;
     }
 
     @Action()
     setSpecialToken(token: string): void {
-        this.setToken('specialChild' + token);
+        this.setToken(SPECIAL_PREFIX + token);
     }
 }
 
@@ -160,8 +168,8 @@ describe('Given a vuex module class with vuex-annotations', () => {
                 token = module!.getToken();
             });
 
-            test('Then, the token has the initialParentToken value', () => {
-                expect(token).toBe('initialParentToken');
+            test('Then, the token has the right value', () => {
+                expect(token).toBe(PARENT_PREFIX + INITIAL_TOKEN_IN_PARENT);
             });
 
         });
@@ -174,8 +182,8 @@ describe('Given a vuex module class with vuex-annotations', () => {
                 token = module!.token;
             });
 
-            test('Then, the token has the initialParentToken value', () => {
-                expect(token).toBe('initialParentToken');
+            test('Then, the token has the right value', () => {
+                expect(token).toBe(PARENT_PREFIX + INITIAL_TOKEN_IN_PARENT);
             });
 
         });
@@ -193,7 +201,7 @@ describe('Given a vuex module class with vuex-annotations', () => {
             });
 
             test('Then, the state token has been changed correctly', () => {
-                expect(module!.getToken()).toBe(payload);
+                expect(module!.getToken()).toBe(PARENT_PREFIX + PARENT_PREFIX + payload);
             });
         });
 
@@ -210,7 +218,7 @@ describe('Given a vuex module class with vuex-annotations', () => {
             });
 
             test('Then, the state token has been changed correctly', () => {
-                expect(module!.getToken()).toBe('special' + payload);
+                expect(module!.getToken()).toBe(PARENT_PREFIX + PARENT_PREFIX + SPECIAL_PREFIX + payload);
             });
 
         });
@@ -252,8 +260,8 @@ describe('Given a vuex module class with vuex-annotations', () => {
                 token = childModule!.getToken();
             });
 
-            test('Then, the token has the childinitialChildToken value', () => {
-                expect(token).toBe('childinitialChildToken');
+            test('Then, the token has the right value', () => {
+                expect(token).toBe(CHILD_PREFIX + INITIAL_TOKEN_IN_CHILD);
             });
 
         });
@@ -266,8 +274,8 @@ describe('Given a vuex module class with vuex-annotations', () => {
                 token = childModule!.getParentToken();
             });
 
-            test('Then, the token has the initialParentToken value', () => {
-                expect(token).toBe('initialParentToken');
+            test('Then, the token has the right value', () => {
+                expect(token).toBe(PARENT_PREFIX + INITIAL_PARENT_TOKEN_IN_PARENT);
             });
 
         });
@@ -280,8 +288,8 @@ describe('Given a vuex module class with vuex-annotations', () => {
                 token = childModule!.token;
             });
 
-            test('Then, the token has the childinitialChildToken value', () => {
-                expect(token).toBe('childinitialChildToken');
+            test('Then, the token has the right value', () => {
+                expect(token).toBe(CHILD_PREFIX + INITIAL_TOKEN_IN_CHILD);
             });
 
         });
@@ -294,8 +302,8 @@ describe('Given a vuex module class with vuex-annotations', () => {
                 token = childModule!.parentToken;
             });
 
-            test('Then, the token has the initialParentToken value', () => {
-                expect(token).toBe('initialParentToken');
+            test('Then, the token has the right value', () => {
+                expect(token).toBe(PARENT_PREFIX + INITIAL_PARENT_TOKEN_IN_PARENT);
             });
 
         });
@@ -330,7 +338,7 @@ describe('Given a vuex module class with vuex-annotations', () => {
             });
 
             test('Then, the state token has been changed correctly', () => {
-                expect(childModule!.getParentToken()).toBe(payload);
+                expect(childModule!.getParentToken()).toBe(PARENT_PREFIX + PARENT_PREFIX + payload);
             });
         });
 
@@ -347,7 +355,7 @@ describe('Given a vuex module class with vuex-annotations', () => {
             });
 
             test('Then, the state token has been changed correctly', () => {
-                expect(childModule!.getToken()).toBe('childchildspecialChild' + payload);
+                expect(childModule!.getToken()).toBe(CHILD_PREFIX + CHILD_PREFIX + SPECIAL_PREFIX + payload);
             });
 
         });
@@ -365,7 +373,7 @@ describe('Given a vuex module class with vuex-annotations', () => {
             });
 
             test('Then, the state token has been changed correctly', () => {
-                expect(childModule!.getParentToken()).toBe('special' + payload);
+                expect(childModule!.getParentToken()).toBe(PARENT_PREFIX + PARENT_PREFIX + SPECIAL_PREFIX + payload);
             });
 
         });
