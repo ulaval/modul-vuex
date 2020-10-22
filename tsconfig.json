@@ -14,8 +14,6 @@
         "moduleResolution": "node",
         "experimentalDecorators": true,
         "allowSyntheticDefaultImports": true,
-        "strictNullChecks": true,
-        "types": [],
-        "typeRoots": []
+        "strictNullChecks": true
     }
 }

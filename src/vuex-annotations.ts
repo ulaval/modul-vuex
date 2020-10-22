@@ -14,12 +14,12 @@ function debug(type: 'act' | 'mut' | 'get', moduleName: string, key: string, arg
     }
 }
 
-type GetterFunc = (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => any;
+type GetterFunc = (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => void;
 
 export function Getter(): GetterFunc {
     // target is the class constructor
     // key is the name of the property
-    return (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => {
+    return (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => {
         const hasArguments = !descriptor.get;
         const originalFunction = descriptor.get || descriptor.value;
 
@@ -52,17 +52,22 @@ export function Getter(): GetterFunc {
         hasArguments ? descriptor.value = getterFunction : descriptor.get = getterFunction;
 
         // Keep a copy of the wrapped function so that it can be registered
-        if (!target['_getters']) {
+        if (!Object.getOwnPropertyDescriptor(target, '_getters')) {
             target['_getters'] = {};
         }
+
+        if (target['_getters'][key]) {
+            throw new Error('Duplicate getter key ' + key + ' of target ' + target.constructor.name + ' has already been set');
+        }
+
         target['_getters'][key] = wrapperFunction;
     };
 }
 
-type MutationFunc = (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => any;
+type MutationFunc = (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => void;
 
 export function Mutation(params?: { options: Vuex.CommitOptions }): MutationFunc {
-    return (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => {
+    return (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => {
 
         const originalFunction = descriptor.value;
 
@@ -79,17 +84,22 @@ export function Mutation(params?: { options: Vuex.CommitOptions }): MutationFunc
 
         descriptor.value = commitFunction;
 
-        if (!target['_mutations']) {
+        if (!Object.getOwnPropertyDescriptor(target, '_mutations')) {
             target['_mutations'] = {};
         }
+
+        if (target['_mutations'][key]) {
+            throw new Error('Duplicate mutation key ' + key + ' of target ' + target.constructor.name + ' has already been set');
+        }
+
         target['_mutations'][key] = wrapperFunction;
     };
 }
 
-type ActionFunc = (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => any;
+type ActionFunc = (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => void;
 
 export function Action(): ActionFunc {
-    return (target: any, key: any, descriptor: TypedPropertyDescriptor<any>) => {
+    return (target: any, key: string, descriptor: TypedPropertyDescriptor<any>) => {
 
         const originalFunction = descriptor.value;
 
@@ -106,9 +116,14 @@ export function Action(): ActionFunc {
 
         descriptor.value = dispatchFunction;
 
-        if (!target['_actions']) {
+        if (!Object.getOwnPropertyDescriptor(target, '_actions')) {
             target['_actions'] = {};
         }
+
+        if (target['_actions'][key]) {
+            throw new Error('Duplicate action key ' + key + ' of target ' + target.constructor.name + ' has already been set');
+        }
+
         target['_actions'][key] = wrapperFunction;
     };
 }
@@ -125,6 +140,24 @@ function bindThis(_this: any, object: any): any {
     return binded;
 }
 
+function getRecursiveAnnotations(object: any, keyAnnotations: string): any {
+    const recursiveAnnotations: any = {};
+
+    let parentObject: any = Object.getPrototypeOf(object);
+
+    while (parentObject) {
+        for (let key in parentObject[keyAnnotations]) {
+            if (!recursiveAnnotations[key]) {
+                recursiveAnnotations[key] = parentObject[keyAnnotations][key];
+            }
+        }
+
+        parentObject = Object.getPrototypeOf(parentObject);
+    }
+
+    return recursiveAnnotations;
+}
+
 /**
  * This class is the required base class to be able to use the Getter, Mutation, and Action decorators.
  *
@@ -135,12 +168,12 @@ function bindThis(_this: any, object: any): any {
 export abstract class ModuleBase<S> {
 
     constructor(protected moduleName: string, protected state: S, public store: Vuex.Store<any>) {
-        const options = {
+        const options: Vuex.Module<S, {}> = {
             namespaced: true,
             state,
-            getters: bindThis(this, (this as any)['_getters']),
-            actions: bindThis(this, (this as any)['_actions']),
-            mutations: bindThis(this, (this as any)['_mutations'])
+            getters: bindThis(this, getRecursiveAnnotations(this, '_getters')),
+            actions: bindThis(this, getRecursiveAnnotations(this, '_actions')),
+            mutations: bindThis(this, getRecursiveAnnotations(this, '_mutations'))
         };
 
         store.registerModule(this.moduleName, options);
